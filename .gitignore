@@ -1,4 +1,30 @@
-venv/
+# Environment variables
+backend/.env
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+
+# Virtual environment
+backend/venv/
+backend/.venv/
+
+# Node
+frontend/node_modules/
+
+# Vite build
+frontend/dist/
+
+# Environment files
 .env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
