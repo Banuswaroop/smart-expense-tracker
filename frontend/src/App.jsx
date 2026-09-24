@@ -13,6 +13,8 @@ import {
   Legend,
 } from "recharts";
 
+import "./App.css";
+
 const API_URL = "http://127.0.0.1:8000";
 
 const pieColors = [
@@ -119,14 +121,19 @@ function App() {
       headers.Authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers,
-    });
+    const response = await fetch(
+      `${API_URL}${endpoint}`,
+      {
+        ...options,
+        headers,
+      }
+    );
 
     if (response.status === 401) {
       logout();
-      throw new Error("Session expired. Please login again.");
+      throw new Error(
+        "Session expired. Please login again."
+      );
     }
 
     let data = null;
@@ -153,6 +160,7 @@ function App() {
 
   function logout() {
     localStorage.removeItem("token");
+
     setToken("");
     setUser(null);
     setExpenses([]);
@@ -182,23 +190,30 @@ function App() {
     try {
       setLoading(true);
 
-      const data = await fetch(`${API_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginForm),
-      });
+      const response = await fetch(
+        `${API_URL}/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginForm),
+        }
+      );
 
-      const result = await data.json();
+      const result = await response.json();
 
-      if (!data.ok) {
+      if (!response.ok) {
         throw new Error(
           result?.detail || "Login failed."
         );
       }
 
-      localStorage.setItem("token", result.access_token);
+      localStorage.setItem(
+        "token",
+        result.access_token
+      );
+
       setToken(result.access_token);
 
       setLoginForm({
@@ -269,6 +284,7 @@ function App() {
       });
 
       setShowRegister(false);
+
       setMessage(
         "Registration successful. You can now login."
       );
@@ -499,14 +515,18 @@ function App() {
           }
         );
 
-        setMessage("Expense updated successfully.");
+        setMessage(
+          "Expense updated successfully."
+        );
       } else {
         await apiRequest("/expenses", {
           method: "POST",
           body: JSON.stringify(payload),
         });
 
-        setMessage("Expense added successfully.");
+        setMessage(
+          "Expense added successfully."
+        );
       }
 
       setExpenseForm({
@@ -588,7 +608,9 @@ function App() {
         }
       );
 
-      setMessage("Expense deleted successfully.");
+      setMessage(
+        "Expense deleted successfully."
+      );
 
       await loadDashboardData();
     } catch (err) {
@@ -665,14 +687,18 @@ function App() {
           }
         );
 
-        setMessage("Budget updated successfully.");
+        setMessage(
+          "Budget updated successfully."
+        );
       } else {
         await apiRequest("/budgets", {
           method: "POST",
           body: JSON.stringify(payload),
         });
 
-        setMessage("Budget created successfully.");
+        setMessage(
+          "Budget created successfully."
+        );
       }
 
       setBudgetForm({
@@ -745,7 +771,9 @@ function App() {
         }
       );
 
-      setMessage("Budget deleted successfully.");
+      setMessage(
+        "Budget deleted successfully."
+      );
 
       await Promise.all([
         fetchBudgets(),
@@ -787,171 +815,223 @@ function App() {
 
   if (!token || !user) {
     return (
-      <div
-        style={{
-          maxWidth: "500px",
-          margin: "50px auto",
-          padding: "30px",
-          background: "white",
-          borderRadius: "10px",
-          boxShadow:
-            "0 2px 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h1>Smart Expense Tracker</h1>
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="brand">
+            <h1 className="brand-title">
+              Smart Expense Tracker
+            </h1>
 
-        {message && (
-          <p style={{ color: "green" }}>
-            {message}
-          </p>
-        )}
+            <p className="brand-subtitle">
+              Manage your spending with clarity.
+            </p>
+          </div>
 
-        {error && (
-          <p style={{ color: "red" }}>
-            {error}
-          </p>
-        )}
+          {message && (
+            <div className="success-message">
+              {message}
+            </div>
+          )}
 
-        {!showRegister ? (
-          <>
-            <h2>Login</h2>
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
 
-            <form onSubmit={handleLogin}>
-              <input
-                type="email"
-                placeholder="Email"
-                value={loginForm.email}
-                onChange={(event) =>
-                  setLoginForm({
-                    ...loginForm,
-                    email: event.target.value,
-                  })
-                }
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "10px",
-                }}
-              />
+          {!showRegister ? (
+            <>
+              <div style={{ marginTop: "28px" }}>
+                <h2>Welcome back</h2>
 
-              <input
-                type="password"
-                placeholder="Password"
-                value={loginForm.password}
-                onChange={(event) =>
-                  setLoginForm({
-                    ...loginForm,
-                    password:
-                      event.target.value,
-                  })
-                }
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "10px",
-                }}
-              />
+                <p>
+                  Sign in to continue to your
+                  expense dashboard.
+                </p>
+              </div>
 
-              <button
-                type="submit"
-                disabled={loading}
+              <form
+                className="auth-form"
+                onSubmit={handleLogin}
               >
-                {loading ? "Logging in..." : "Login"}
-              </button>
-            </form>
+                <div className="form-group">
+                  <label className="form-label">
+                    Email
+                  </label>
 
-            <br />
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={loginForm.email}
+                    onChange={(event) =>
+                      setLoginForm({
+                        ...loginForm,
+                        email:
+                          event.target.value,
+                      })
+                    }
+                  />
+                </div>
 
-            <button
-              onClick={() => {
-                setShowRegister(true);
-                setError("");
-                setMessage("");
-              }}
-            >
-              Create Account
-            </button>
-          </>
-        ) : (
-          <>
-            <h2>Create Account</h2>
+                <div className="form-group">
+                  <label className="form-label">
+                    Password
+                  </label>
 
-            <form onSubmit={handleRegister}>
-              <input
-                type="text"
-                placeholder="Name"
-                value={registerForm.name}
-                onChange={(event) =>
-                  setRegisterForm({
-                    ...registerForm,
-                    name: event.target.value,
-                  })
-                }
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={loginForm.password}
+                    onChange={(event) =>
+                      setLoginForm({
+                        ...loginForm,
+                        password:
+                          event.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="primary"
+                  disabled={loading}
+                >
+                  {loading
+                    ? "Logging in..."
+                    : "Login"}
+                </button>
+              </form>
+
+              <div
                 style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "10px",
+                  marginTop: "24px",
+                  textAlign: "center",
                 }}
-              />
-
-              <input
-                type="email"
-                placeholder="Email"
-                value={registerForm.email}
-                onChange={(event) =>
-                  setRegisterForm({
-                    ...registerForm,
-                    email: event.target.value,
-                  })
-                }
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "10px",
-                }}
-              />
-
-              <input
-                type="password"
-                placeholder="Password"
-                value={registerForm.password}
-                onChange={(event) =>
-                  setRegisterForm({
-                    ...registerForm,
-                    password:
-                      event.target.value,
-                  })
-                }
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "10px",
-                }}
-              />
-
-              <button
-                type="submit"
-                disabled={loading}
               >
-                {loading
-                  ? "Creating..."
-                  : "Create Account"}
-              </button>
-            </form>
+                <p>
+                  Don't have an account?
+                </p>
 
-            <br />
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => {
+                    setShowRegister(true);
+                    setError("");
+                    setMessage("");
+                  }}
+                >
+                  Create Account
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ marginTop: "28px" }}>
+                <h2>Create your account</h2>
 
-            <button
-              onClick={() => {
-                setShowRegister(false);
-                setError("");
-                setMessage("");
-              }}
-            >
-              Back to Login
-            </button>
-          </>
-        )}
+                <p>
+                  Start managing your expenses
+                  in one place.
+                </p>
+              </div>
+
+              <form
+                className="auth-form"
+                onSubmit={handleRegister}
+              >
+                <div className="form-group">
+                  <label className="form-label">
+                    Name
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="Your name"
+                    value={registerForm.name}
+                    onChange={(event) =>
+                      setRegisterForm({
+                        ...registerForm,
+                        name:
+                          event.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Email
+                  </label>
+
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={registerForm.email}
+                    onChange={(event) =>
+                      setRegisterForm({
+                        ...registerForm,
+                        email:
+                          event.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Password
+                  </label>
+
+                  <input
+                    type="password"
+                    placeholder="At least 6 characters"
+                    value={
+                      registerForm.password
+                    }
+                    onChange={(event) =>
+                      setRegisterForm({
+                        ...registerForm,
+                        password:
+                          event.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="primary"
+                  disabled={loading}
+                >
+                  {loading
+                    ? "Creating..."
+                    : "Create Account"}
+                </button>
+              </form>
+
+              <div
+                style={{
+                  marginTop: "24px",
+                  textAlign: "center",
+                }}
+              >
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => {
+                    setShowRegister(false);
+                    setError("");
+                    setMessage("");
+                  }}
+                >
+                  Back to Login
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     );
   }
@@ -961,133 +1041,139 @@ function App() {
   // =========================
 
   return (
-    <div
-      style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "30px",
-      }}
-    >
+    <div className="app-container">
+
       {/* HEADER */}
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "30px",
-        }}
-      >
-        <div>
-          <h1>Smart Expense Tracker</h1>
+      <header className="app-header">
+        <div className="header-content">
 
-          <p>
-            Welcome, <strong>{user.name}</strong>
+          <div className="brand">
+            <h1 className="brand-title">
+              Smart Expense Tracker
+            </h1>
+
+            <p className="brand-subtitle">
+              Personal finance dashboard
+            </p>
+          </div>
+
+          <div className="header-actions">
+            <div
+              style={{
+                textAlign: "right",
+                marginRight: "8px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "600",
+                }}
+              >
+                {user.name}
+              </div>
+
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#6b7280",
+                }}
+              >
+                {user.email}
+              </div>
+            </div>
+
+            <button
+              className="secondary"
+              onClick={logout}
+            >
+              Logout
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      <main className="main-content">
+
+        {/* PAGE INTRO */}
+
+        <div className="dashboard-section">
+          <h1 className="page-title">
+            Dashboard
+          </h1>
+
+          <p className="page-description">
+            Track your spending, manage expenses,
+            and monitor your monthly budgets.
           </p>
-
-          <p>{user.email}</p>
         </div>
 
-        <button onClick={logout}>
-          Logout
-        </button>
-      </div>
+        {/* MESSAGES */}
 
-      {/* MESSAGES */}
+        {message && (
+          <div className="success-message">
+            {message}
+          </div>
+        )}
 
-      {message && (
-        <div
-          style={{
-            padding: "10px",
-            marginBottom: "15px",
-            background: "#e8f5e9",
-          }}
-        >
-          {message}
-        </div>
-      )}
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
 
-      {error && (
-        <div
-          style={{
-            padding: "10px",
-            marginBottom: "15px",
-            background: "#ffebee",
-            color: "#c62828",
-          }}
-        >
-          {error}
-        </div>
-      )}
+        {/* SUMMARY CARDS */}
 
-      {/* DASHBOARD */}
+        <section className="summary-grid">
 
-      <section>
-        <h2>Dashboard</h2>
+          <div className="summary-card">
+            <p className="summary-label">
+              Total Expenses
+            </p>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              padding: "20px",
-              background: "white",
-              borderRadius: "8px",
-              minWidth: "200px",
-            }}
-          >
-            <h3>Total Expenses</h3>
-
-            <p>
+            <p className="summary-value">
               {dashboard?.total_expenses ?? 0}
             </p>
           </div>
 
-          <div
-            style={{
-              padding: "20px",
-              background: "white",
-              borderRadius: "8px",
-              minWidth: "200px",
-            }}
-          >
-            <h3>Total Amount</h3>
+          <div className="summary-card">
+            <p className="summary-label">
+              Total Amount
+            </p>
 
-            <p>
-              ₹
-              {dashboard?.total_amount ?? 0}
+            <p className="summary-value">
+              ₹{dashboard?.total_amount ?? 0}
             </p>
           </div>
-        </div>
 
-        <br />
+          <div className="summary-card">
+            <p className="summary-label">
+              Current Page
+            </p>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "30px",
-            flexWrap: "wrap",
-          }}
-        >
+            <p className="summary-value">
+              {page}
+            </p>
+          </div>
+
+        </section>
+
+        {/* CHARTS */}
+
+        <section className="chart-grid">
+
           {/* PIE CHART */}
 
-          <div
-            style={{
-              background: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              flex: "1 1 500px",
-              minWidth: "400px",
-            }}
-          >
-            <h3>Category-wise Spending</h3>
+          <div className="chart-card">
+
+            <h2>Category-wise Spending</h2>
 
             {pieData.length === 0 ? (
-              <p>No category data available.</p>
+              <div className="empty-state">
+                No category data available.
+              </div>
             ) : (
               <div
                 style={{
@@ -1138,25 +1224,19 @@ function App() {
                 </ResponsiveContainer>
               </div>
             )}
+
           </div>
 
           {/* BAR CHART */}
 
-          <div
-            style={{
-              background: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              flex: "1 1 500px",
-              minWidth: "400px",
-            }}
-          >
-            <h3>Monthly Spending</h3>
+          <div className="chart-card">
+
+            <h2>Monthly Spending</h2>
 
             {barData.length === 0 ? (
-              <p>
+              <div className="empty-state">
                 No monthly data available.
-              </p>
+              </div>
             ) : (
               <div
                 style={{
@@ -1191,500 +1271,837 @@ function App() {
                 </ResponsiveContainer>
               </div>
             )}
+
           </div>
-        </div>
-      </section>
 
-      <hr />
+        </section>
 
-      {/* EXPENSE FORM */}
+        {/* EXPENSE FORM */}
 
-      <section id="expense-form">
-        <h2>
-          {editingExpenseId
-            ? "Edit Expense"
-            : "Add Expense"}
-        </h2>
-
-        <form onSubmit={handleExpenseSubmit}>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="Amount"
-            value={expenseForm.amount}
-            onChange={(event) =>
-              setExpenseForm({
-                ...expenseForm,
-                amount: event.target.value,
-              })
-            }
-          />
-
-          {" "}
-
-          <input
-            type="text"
-            placeholder="Description"
-            value={expenseForm.description}
-            onChange={(event) =>
-              setExpenseForm({
-                ...expenseForm,
-                description:
-                  event.target.value,
-              })
-            }
-          />
-
-          {" "}
-
-          <input
-            type="text"
-            placeholder="Category"
-            value={expenseForm.category}
-            onChange={(event) =>
-              setExpenseForm({
-                ...expenseForm,
-                category:
-                  event.target.value,
-              })
-            }
-          />
-
-          {" "}
-
-          <input
-            type="date"
-            value={expenseForm.expense_date}
-            onChange={(event) =>
-              setExpenseForm({
-                ...expenseForm,
-                expense_date:
-                  event.target.value,
-              })
-            }
-          />
-
-          {" "}
-
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {editingExpenseId
-              ? "Update Expense"
-              : "Add Expense"}
-          </button>
-
-          {editingExpenseId && (
-            <>
-              {" "}
-
-              <button
-                type="button"
-                onClick={cancelExpenseEdit}
-              >
-                Cancel
-              </button>
-            </>
-          )}
-        </form>
-      </section>
-
-      <hr />
-
-      {/* SEARCH AND FILTER */}
-
-      <section>
-        <h2>Search & Filter</h2>
-
-        <input
-          type="text"
-          value={search}
-          onChange={(event) =>
-            setSearch(event.target.value)
-          }
-          placeholder="Search description"
-        />
-
-        {" "}
-
-        <input
-          type="text"
-          value={filterCategory}
-          onChange={(event) =>
-            setFilterCategory(
-              event.target.value
-            )
-          }
-          placeholder="Category"
-        />
-
-        {" "}
-
-        <button onClick={handleSearch}>
-          Search
-        </button>
-
-        {" "}
-
-        <button
-          onClick={() => {
-            setSearch("");
-            setFilterCategory("");
-            setTimeout(() => {
-              fetchExpenses(1);
-            }, 0);
-          }}
+        <section
+          id="expense-form"
+          className="dashboard-section"
         >
-          Clear Filters
-        </button>
+          <div className="section-card">
 
-        <br />
-        <br />
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">
+                  {editingExpenseId
+                    ? "Edit Expense"
+                    : "Add Expense"}
+                </h2>
 
-        <label>Sort By: </label>
+                <p className="section-description">
+                  Record your spending details.
+                </p>
+              </div>
+            </div>
 
-        <select
-          value={sortBy}
-          onChange={(event) => {
-            setSortBy(event.target.value);
+            <form
+              className="form-grid"
+              onSubmit={handleExpenseSubmit}
+            >
 
-            setTimeout(() => {
-              fetchExpenses(1);
-            }, 0);
-          }}
-        >
-          <option value="expense_date">
-            Date
-          </option>
+              <div className="form-group">
+                <label className="form-label">
+                  Amount
+                </label>
 
-          <option value="amount">
-            Amount
-          </option>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={expenseForm.amount}
+                  onChange={(event) =>
+                    setExpenseForm({
+                      ...expenseForm,
+                      amount:
+                        event.target.value,
+                    })
+                  }
+                />
+              </div>
 
-          <option value="created_at">
-            Created Time
-          </option>
-        </select>
+              <div className="form-group">
+                <label className="form-label">
+                  Date
+                </label>
 
-        {" "}
+                <input
+                  type="date"
+                  value={
+                    expenseForm.expense_date
+                  }
+                  onChange={(event) =>
+                    setExpenseForm({
+                      ...expenseForm,
+                      expense_date:
+                        event.target.value,
+                    })
+                  }
+                />
+              </div>
 
-        <select
-          value={order}
-          onChange={(event) => {
-            setOrder(event.target.value);
+              <div className="form-group">
+                <label className="form-label">
+                  Description
+                </label>
 
-            setTimeout(() => {
-              fetchExpenses(1);
-            }, 0);
-          }}
-        >
-          <option value="desc">
-            Descending
-          </option>
+                <input
+                  type="text"
+                  placeholder="e.g. Grocery shopping"
+                  value={
+                    expenseForm.description
+                  }
+                  onChange={(event) =>
+                    setExpenseForm({
+                      ...expenseForm,
+                      description:
+                        event.target.value,
+                    })
+                  }
+                />
+              </div>
 
-          <option value="asc">
-            Ascending
-          </option>
-        </select>
-      </section>
+              <div className="form-group">
+                <label className="form-label">
+                  Category
+                </label>
 
-      <hr />
+                <input
+                  type="text"
+                  placeholder="e.g. Food"
+                  value={
+                    expenseForm.category
+                  }
+                  onChange={(event) =>
+                    setExpenseForm({
+                      ...expenseForm,
+                      category:
+                        event.target.value,
+                    })
+                  }
+                />
+              </div>
 
-      {/* EXPENSE LIST */}
-
-      <section>
-        <h2>Your Expenses</h2>
-
-        {expenses.length === 0 ? (
-          <p>No expenses found.</p>
-        ) : (
-          <ul>
-            {expenses.map((expense) => (
-              <li
-                key={expense.id}
+              <div
                 style={{
-                  marginBottom: "10px",
+                  display: "flex",
+                  gap: "10px",
+                  alignItems: "center",
                 }}
               >
-                <strong>
-                  {expense.description}
-                </strong>
-
-                {" - ₹"}
-
-                {expense.amount}
-
-                {" - "}
-
-                {expense.category}
-
-                {" - "}
-
-                {expense.expense_date}
-
-                {" "}
-
                 <button
-                  onClick={() =>
-                    startEditing(expense)
-                  }
+                  type="submit"
+                  className="primary"
+                  disabled={loading}
                 >
-                  Edit
+                  {editingExpenseId
+                    ? "Update Expense"
+                    : "Add Expense"}
                 </button>
 
-                {" "}
+                {editingExpenseId && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={
+                      cancelExpenseEdit
+                    }
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
 
-                <button
-                  onClick={() =>
-                    handleDeleteExpense(
-                      expense.id
+            </form>
+
+          </div>
+        </section>
+
+        {/* SEARCH AND FILTER */}
+
+        <section className="dashboard-section">
+
+          <div className="section-card">
+
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">
+                  Search & Filter
+                </h2>
+
+                <p className="section-description">
+                  Find and sort your expenses.
+                </p>
+              </div>
+            </div>
+
+            <div className="filter-bar">
+
+              <div className="form-group">
+                <label className="form-label">
+                  Search
+                </label>
+
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(event) =>
+                    setSearch(
+                      event.target.value
                     )
                   }
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+                  placeholder="Search description"
+                />
+              </div>
 
-        {/* PAGINATION */}
+              <div className="form-group">
+                <label className="form-label">
+                  Category
+                </label>
 
-        <div>
-          <button
-            disabled={page <= 1}
-            onClick={() =>
-              fetchExpenses(page - 1)
-            }
-          >
-            Previous
-          </button>
-
-          {" "}
-
-          <span>
-            Page {page} of{" "}
-            {totalPages || 1}
-          </span>
-
-          {" "}
-
-          <button
-            disabled={
-              page >= totalPages ||
-              totalPages === 0
-            }
-            onClick={() =>
-              fetchExpenses(page + 1)
-            }
-          >
-            Next
-          </button>
-        </div>
-      </section>
-
-      <hr />
-
-      {/* BUDGET FORM */}
-
-      <section>
-        <h2>
-          {editingBudgetId
-            ? "Edit Budget"
-            : "Create Budget"}
-        </h2>
-
-        <form onSubmit={handleBudgetSubmit}>
-          <input
-            type="text"
-            placeholder="Category"
-            value={budgetForm.category}
-            onChange={(event) =>
-              setBudgetForm({
-                ...budgetForm,
-                category:
-                  event.target.value,
-              })
-            }
-          />
-
-          {" "}
-
-          <input
-            type="date"
-            value={budgetForm.month}
-            onChange={(event) =>
-              setBudgetForm({
-                ...budgetForm,
-                month: event.target.value,
-              })
-            }
-          />
-
-          {" "}
-
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="Budget Amount"
-            value={budgetForm.amount}
-            onChange={(event) =>
-              setBudgetForm({
-                ...budgetForm,
-                amount: event.target.value,
-              })
-            }
-          />
-
-          {" "}
-
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {editingBudgetId
-              ? "Update Budget"
-              : "Create Budget"}
-          </button>
-
-          {editingBudgetId && (
-            <>
-              {" "}
-
-              <button
-                type="button"
-                onClick={cancelBudgetEdit}
-              >
-                Cancel
-              </button>
-            </>
-          )}
-        </form>
-      </section>
-
-      <hr />
-
-      {/* BUDGET LIST */}
-
-      <section>
-        <h2>Your Budgets</h2>
-
-        {budgets.length === 0 ? (
-          <p>No budgets found.</p>
-        ) : (
-          <ul>
-            {budgets.map((budget) => (
-              <li
-                key={budget.id}
-                style={{
-                  marginBottom: "10px",
-                }}
-              >
-                <strong>
-                  {budget.category}
-                </strong>
-
-                {" - ₹"}
-
-                {budget.amount}
-
-                {" - "}
-
-                {budget.month}
-
-                {" "}
-
-                <button
-                  onClick={() =>
-                    startBudgetEditing(
-                      budget
+                <input
+                  type="text"
+                  value={
+                    filterCategory
+                  }
+                  onChange={(event) =>
+                    setFilterCategory(
+                      event.target.value
                     )
                   }
-                >
-                  Edit
-                </button>
+                  placeholder="Category"
+                />
+              </div>
 
-                {" "}
+              <div className="form-group">
+                <label className="form-label">
+                  Sort By
+                </label>
 
-                <button
-                  onClick={() =>
-                    handleDeleteBudget(
-                      budget.id
-                    )
-                  }
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                <select
+                  value={sortBy}
+                  onChange={(event) => {
+                    setSortBy(
+                      event.target.value
+                    );
 
-      <hr />
-
-      {/* BUDGET PROGRESS */}
-
-      <section>
-        <h2>Budget Progress</h2>
-
-        {budgetProgress.length === 0 ? (
-          <p>
-            No budget progress available.
-          </p>
-        ) : (
-          <ul>
-            {budgetProgress.map(
-              (budget, index) => (
-                <li
-                  key={`${budget.category}-${budget.month}-${index}`}
-                  style={{
-                    marginBottom: "20px",
+                    setTimeout(() => {
+                      fetchExpenses(1);
+                    }, 0);
                   }}
                 >
-                  <strong>
-                    {budget.category}
-                  </strong>
+                  <option value="expense_date">
+                    Date
+                  </option>
 
-                  <p>
-                    Month: {budget.month}
-                  </p>
+                  <option value="amount">
+                    Amount
+                  </option>
 
-                  <p>
-                    Budget: ₹
-                    {budget.budget_amount}
-                  </p>
+                  <option value="created_at">
+                    Created Time
+                  </option>
+                </select>
+              </div>
 
-                  <p>
-                    Actual: ₹
-                    {budget.actual_amount}
-                  </p>
+              <div className="form-group">
+                <label className="form-label">
+                  Order
+                </label>
 
-                  <p>
-                    Remaining: ₹
-                    {budget.remaining_amount}
-                  </p>
+                <select
+                  value={order}
+                  onChange={(event) => {
+                    setOrder(
+                      event.target.value
+                    );
 
-                  <p>
-                    Used:{" "}
-                    {budget.percentage_used}%
-                  </p>
+                    setTimeout(() => {
+                      fetchExpenses(1);
+                    }, 0);
+                  }}
+                >
+                  <option value="desc">
+                    Descending
+                  </option>
 
-                  <p>
-                    Status:{" "}
-                    {budget.is_over_budget
-                      ? "Over Budget"
-                      : "Within Budget"}
-                  </p>
-                </li>
-              )
+                  <option value="asc">
+                    Ascending
+                  </option>
+                </select>
+              </div>
+
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+              <button
+                className="primary"
+                onClick={handleSearch}
+              >
+                Search
+              </button>
+
+              <button
+                className="secondary"
+                onClick={() => {
+                  setSearch("");
+                  setFilterCategory("");
+
+                  setTimeout(() => {
+                    fetchExpenses(1);
+                  }, 0);
+                }}
+              >
+                Clear Filters
+              </button>
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* EXPENSE LIST */}
+
+        <section className="dashboard-section">
+
+          <div className="section-card">
+
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">
+                  Your Expenses
+                </h2>
+
+                <p className="section-description">
+                  View, edit, and manage your
+                  recorded expenses.
+                </p>
+              </div>
+            </div>
+
+            {expenses.length === 0 ? (
+              <div className="empty-state">
+                No expenses found.
+              </div>
+            ) : (
+              <div className="table-wrapper">
+
+                <table className="expense-table">
+
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                      <th>Category</th>
+                      <th>Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {expenses.map(
+                      (expense) => (
+                        <tr key={expense.id}>
+
+                          <td>
+                            <span className="expense-description">
+                              {
+                                expense.description
+                              }
+                            </span>
+                          </td>
+
+                          <td>
+                            <span className="expense-amount">
+                              ₹{expense.amount}
+                            </span>
+                          </td>
+
+                          <td>
+                            <span className="category-badge">
+                              {
+                                expense.category
+                              }
+                            </span>
+                          </td>
+
+                          <td>
+                            {expense.expense_date}
+                          </td>
+
+                          <td>
+                            <div className="table-actions">
+
+                              <button
+                                className="secondary"
+                                onClick={() =>
+                                  startEditing(
+                                    expense
+                                  )
+                                }
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                className="danger"
+                                onClick={() =>
+                                  handleDeleteExpense(
+                                    expense.id
+                                  )
+                                }
+                              >
+                                Delete
+                              </button>
+
+                            </div>
+                          </td>
+
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+
+                </table>
+
+              </div>
             )}
-          </ul>
-        )}
-      </section>
+
+            {/* PAGINATION */}
+
+            <div className="pagination">
+
+              <button
+                className="secondary"
+                disabled={page <= 1}
+                onClick={() =>
+                  fetchExpenses(page - 1)
+                }
+              >
+                Previous
+              </button>
+
+              <span className="pagination-info">
+                Page {page} of{" "}
+                {totalPages || 1}
+              </span>
+
+              <button
+                className="secondary"
+                disabled={
+                  page >= totalPages ||
+                  totalPages === 0
+                }
+                onClick={() =>
+                  fetchExpenses(page + 1)
+                }
+              >
+                Next
+              </button>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* BUDGET FORM */}
+
+        <section className="dashboard-section">
+
+          <div className="section-card">
+
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">
+                  {editingBudgetId
+                    ? "Edit Budget"
+                    : "Create Budget"}
+                </h2>
+
+                <p className="section-description">
+                  Set spending limits for your
+                  categories.
+                </p>
+              </div>
+            </div>
+
+            <form
+              className="form-grid"
+              onSubmit={handleBudgetSubmit}
+            >
+
+              <div className="form-group">
+                <label className="form-label">
+                  Category
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="e.g. Food"
+                  value={
+                    budgetForm.category
+                  }
+                  onChange={(event) =>
+                    setBudgetForm({
+                      ...budgetForm,
+                      category:
+                        event.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">
+                  Month
+                </label>
+
+                <input
+                  type="date"
+                  value={
+                    budgetForm.month
+                  }
+                  onChange={(event) =>
+                    setBudgetForm({
+                      ...budgetForm,
+                      month:
+                        event.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">
+                  Budget Amount
+                </label>
+
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={
+                    budgetForm.amount
+                  }
+                  onChange={(event) =>
+                    setBudgetForm({
+                      ...budgetForm,
+                      amount:
+                        event.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "end",
+                  gap: "10px",
+                }}
+              >
+                <button
+                  type="submit"
+                  className="primary"
+                  disabled={loading}
+                >
+                  {editingBudgetId
+                    ? "Update Budget"
+                    : "Create Budget"}
+                </button>
+
+                {editingBudgetId && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={
+                      cancelBudgetEdit
+                    }
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+
+            </form>
+
+          </div>
+
+        </section>
+
+        {/* BUDGET LIST */}
+
+        <section className="dashboard-section">
+
+          <div className="section-card">
+
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">
+                  Your Budgets
+                </h2>
+
+                <p className="section-description">
+                  Manage your category spending
+                  limits.
+                </p>
+              </div>
+            </div>
+
+            {budgets.length === 0 ? (
+              <div className="empty-state">
+                No budgets found.
+              </div>
+            ) : (
+              <div className="budget-grid">
+
+                {budgets.map((budget) => (
+                  <div
+                    className="budget-card"
+                    key={budget.id}
+                  >
+
+                    <div className="budget-header">
+
+                      <div>
+                        <h3 className="budget-category">
+                          {budget.category}
+                        </h3>
+
+                        <span className="budget-month">
+                          {budget.month}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                        }}
+                      >
+                        <button
+                          className="secondary"
+                          onClick={() =>
+                            startBudgetEditing(
+                              budget
+                            )
+                          }
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          className="danger"
+                          onClick={() =>
+                            handleDeleteBudget(
+                              budget.id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+                      </div>
+
+                    </div>
+
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "14px",
+                        color: "#6b7280",
+                      }}
+                    >
+                      Budget amount
+                    </p>
+
+                    <p
+                      style={{
+                        margin:
+                          "5px 0 0",
+                        fontSize: "24px",
+                        fontWeight: "700",
+                      }}
+                    >
+                      ₹{budget.amount}
+                    </p>
+
+                  </div>
+                ))}
+
+              </div>
+            )}
+
+          </div>
+
+        </section>
+
+        {/* BUDGET PROGRESS */}
+
+        <section className="dashboard-section">
+
+          <div className="section-card">
+
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">
+                  Budget Progress
+                </h2>
+
+                <p className="section-description">
+                  Compare your actual spending
+                  with your budgets.
+                </p>
+              </div>
+            </div>
+
+            {budgetProgress.length === 0 ? (
+              <div className="empty-state">
+                No budget progress available.
+              </div>
+            ) : (
+              <div className="budget-grid">
+
+                {budgetProgress.map(
+                  (budget, index) => {
+
+                    const percentage =
+                      Math.min(
+                        Number(
+                          budget.percentage_used
+                        ),
+                        100
+                      );
+
+                    return (
+                      <div
+                        className="budget-card"
+                        key={`${budget.category}-${budget.month}-${index}`}
+                      >
+
+                        <div className="budget-header">
+
+                          <div>
+                            <h3 className="budget-category">
+                              {budget.category}
+                            </h3>
+
+                            <span className="budget-month">
+                              {budget.month}
+                            </span>
+                          </div>
+
+                          <span
+                            className={`budget-status ${
+                              budget.is_over_budget
+                                ? "danger"
+                                : "success"
+                            }`}
+                          >
+                            {budget.is_over_budget
+                              ? "Over Budget"
+                              : "Within Budget"}
+                          </span>
+
+                        </div>
+
+                        <div className="budget-values">
+
+                          <div>
+                            <p className="budget-value-label">
+                              Budget
+                            </p>
+
+                            <p className="budget-value">
+                              ₹
+                              {
+                                budget.budget_amount
+                              }
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="budget-value-label">
+                              Actual
+                            </p>
+
+                            <p className="budget-value">
+                              ₹
+                              {
+                                budget.actual_amount
+                              }
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="budget-value-label">
+                              Remaining
+                            </p>
+
+                            <p className="budget-value">
+                              ₹
+                              {
+                                budget.remaining_amount
+                              }
+                            </p>
+                          </div>
+
+                        </div>
+
+                        <div className="progress-container">
+                          <div
+                            className={`progress-bar ${
+                              budget.is_over_budget
+                                ? "over-budget"
+                                : ""
+                            }`}
+                            style={{
+                              width: `${percentage}%`,
+                            }}
+                          />
+                        </div>
+
+                        <p
+                          style={{
+                            margin:
+                              "10px 0 0",
+                            color:
+                              "#6b7280",
+                            fontSize:
+                              "13px",
+                          }}
+                        >
+                          Used:{" "}
+                          {
+                            budget.percentage_used
+                          }
+                          %
+                        </p>
+
+                      </div>
+                    );
+                  }
+                )}
+
+              </div>
+            )}
+
+          </div>
+
+        </section>
+
+      </main>
     </div>
   );
 }
