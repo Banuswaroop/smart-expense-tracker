@@ -15,7 +15,7 @@ import {
 
 import "./App.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://smart-expense-tracker-api-xvi4.onrender.com";
 
 const pieColors = [
   "#8884d8",
